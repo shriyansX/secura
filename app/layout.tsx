@@ -10,6 +10,7 @@ import {
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
+import { ThemeProvider } from "@/components/theme-provider"
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,7 +36,6 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <Navbar />
           <header className="flex justify-end items-center p-4 gap-4 h-16">
             {/* <SignedOut>
               <SignInButton />
@@ -49,7 +49,15 @@ export default function RootLayout({
               <UserButton />
             </SignedIn> */}
           </header>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar />
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
