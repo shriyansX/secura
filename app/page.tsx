@@ -3,6 +3,12 @@ import { AddPassword } from "@/components/add-password"
 import { YourCards } from "@/components/your-cards"
 import { YourPasswords } from "@/components/your-passwords"
 import { Shield } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Secura - Home",
+  description: "This is the homepage of my Password Manager",
+}
 
 export default function Home() {
   return (
