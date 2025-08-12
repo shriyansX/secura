@@ -1,8 +1,50 @@
-# Secura - Secure Password Manager
+# Secura 🔐
+A modern, open-source password manager built with **Next.js 15**, **TypeScript**, **Tailwind CSS** and **Clerk** authentication.
 
-A modern, secure password manager built with Next.js, TypeScript, and Clerk authentication.
+![Version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 
-## Environment Variables
+---
+
+[🌐 **Live Demo**](https://secura-ten.vercel.app/)
+
+Secura lets you create, store and autofill strong passwords—fully encrypted, accessible from anywhere.
+
+## 🚀 Features
+
+* **End-to-end encryption** – AES-256 + PBKDF2-HMAC-SHA512
+* **Clerk authentication** – social login and magic links
+* **Password generator** – custom length, charset & entropy meter
+* **Secure notes & cards** – store recovery codes, credit cards, TOTP seeds
+* **Responsive UI** – dark mode, keyboard shortcuts
+
+## 🛠️ Tech Stack
+
+| Category | Tech |
+| -------- | ---- |
+| Front-end | Next.js 15 (App Router), React 19, TypeScript |
+| Styling & UI | Tailwind CSS 4, Radix UI, [Shadcn UI](https://ui.shadcn.com/), clsx |
+| Auth | Clerk |
+| Form & Validation | React-Hook-Form, Zod |
+| State Management | React Context / useReducer |
+| Testing | Vitest, React Testing Library |
+| Deployment | Vercel |
+
+## 📂 Folder Structure
+
+```text
+secura/
+├─ app/              # Next.js routes
+│  ├─ api/           # Edge functions
+│  └─ (components)   # Page components
+├─ components/       # Reusable UI components
+├─ lib/              # Utility helpers & context
+├─ public/           # Static assets
+├─ styles/           # Global styles
+└─ tests/            # Unit & integration tests
+```
+
+## ⚙️ Environment Variables
 
 To run this application, you need to set up the following environment variables:
 
@@ -49,7 +91,26 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## 🧑‍💻 Contributing
+
+Contributions are welcome! Feel free to:
+
+1. Fork the repo
+2. Create your feature branch (`git checkout -b feat/my-feature`)
+3. Commit your changes (`git commit -m 'feat: add my feature'`)
+4. Push to the branch (`git push origin feat/my-feature`)
+5. Open a Pull Request
+
+Make sure to run `pnpm test` before submitting.
+
+## 📜 License
+
+MIT © 2025 [Your Name].
+
+---
+
+> Built with ❤️ & ☕ by Shriyans Mukherjee
+
 
 To learn more about Next.js, take a look at the following resources:
 
