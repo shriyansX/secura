@@ -9,8 +9,41 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CreditCard, Plus } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { useSecura } from "@/lib/context/SecuraContext"
+import toast from "react-hot-toast"
+
+const formSchema = z.object({
+  cardNumber: z.string().min(16, {
+    message: "Card number must be at least 16 digits.",
+  })
+    .max(19, {
+      message: "Card number cannot exceed 19 digits.",
+    })
+    .regex(/^\d+$/, {
+      message: "Card number must contain only digits.",
+    }),
+
+  expiryDate: z.string().regex(/^([0-1][0-9]|[1-2])\/\d{2}$/, {
+    message: "Expiry date must be in MM/YY format.",
+  }),
+
+  cvv: z.string().min(3, {
+    message: "CVV must be at least 3 digits.",
+  })
+    .max(4, {
+      message: "CVV cannot exceed 4 digits.",
+    })
+    .regex(/^\d+$/, {
+      message: "CVV must contain only digits.",
+    })
+});
+
 
 export function AddCard() {
+  const { addCard } = useSecura();
   const [formData, setFormData] = useState({
     cardName: "",
     cardNumber: "",
@@ -19,20 +52,81 @@ export function AddCard() {
     cardholderName: "",
     cardType: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Card data:", formData)
-    // Here you would typically save to your backend/database
-    setFormData({
-      cardName: "",
-      cardNumber: "",
-      expiryDate: "",
-      cvv: "",
-      cardholderName: "",
-      cardType: "",
-    })
+    
+    // Basic validation - ignore spaces or dashes in card number
+    const sanitizedNumber = formData.cardNumber.replace(/[^\d]/g, "");
+    if (!sanitizedNumber.match(/^\d{15,19}$/)) {
+      toast.error("Please enter a valid card number (15-19 digits)");
+      return;
+    }
+    
+    if (!formData.expiryDate.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) {
+      toast.error("Please enter a valid expiry date (MM/YY)");
+      return;
+    }
+    
+    if (!formData.cvv.match(/^\d{3,4}$/)) {
+      toast.error("Please enter a valid CVV (3-4 digits)");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      // Save sanitized number
+      addCard({ ...formData, cardNumber: sanitizedNumber });
+      setFormData({
+        cardName: "",
+        cardNumber: "",
+        expiryDate: "",
+        cvv: "",
+        cardholderName: "",
+        cardType: "",
+      });
+      toast.success("Card saved successfully!");
+    } catch (error) {
+      console.error("Error saving card:", error);
+      toast.error("Failed to save card");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
+
+  // Format card number with spaces
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const matches = v.match(/\d{4,16}/g);
+    const match = matches && matches[0] || '';
+    const parts = [];
+    
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+    
+    if (parts.length) {
+      return parts.join(' ');
+    } else {
+      return value;
+    }
+  };
+
+  // Format expiry date
+  const formatExpiryDate = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    
+    if (v.length >= 2) {
+      return v.slice(0, 2) + (v.length > 2 ? '/' + v.slice(2, 4) : '');
+    }
+    
+    return v;
+  };
 
   return (
     <Card className="w-full">
@@ -88,7 +182,10 @@ export function AddCard() {
               id="cardNumber"
               placeholder="1234 5678 9012 3456"
               value={formData.cardNumber}
-              onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
+              onChange={(e) => {
+                const formatted = formatCardNumber(e.target.value);
+                setFormData({ ...formData, cardNumber: formatted });
+              }}
               required
             />
           </div>
@@ -100,25 +197,34 @@ export function AddCard() {
                 id="expiryDate"
                 placeholder="MM/YY"
                 value={formData.expiryDate}
-                onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
+                onChange={(e) => {
+                  const formatted = formatExpiryDate(e.target.value);
+                  setFormData({ ...formData, expiryDate: formatted });
+                }}
                 required
+                maxLength={5}
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="cvv">CVV</Label>
               <Input
                 id="cvv"
                 placeholder="123"
+                type="password"
                 value={formData.cvv}
-                onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  setFormData({ ...formData, cvv: value });
+                }}
                 required
+                maxLength={4}
               />
             </div>
           </div>
 
-          <Button type="submit" className="w-full">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Card
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Card"}
           </Button>
         </form>
       </CardContent>

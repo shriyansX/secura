@@ -1,171 +1,205 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Key, Eye, EyeOff, Copy, Trash2, ExternalLink } from "lucide-react"
-import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Lock, Eye, EyeOff, Trash2, Copy, Search, ExternalLink } from "lucide-react"
+import { useSecura } from "@/lib/context/SecuraContext"
+import toast from "react-hot-toast"
 
-// Mock data - in a real app, this would come from your database
-const mockPasswords = [
-  {
-    id: 1,
-    siteName: "Google",
-    username: "john@example.com",
-    password: "MySecurePassword123!",
-    url: "https://accounts.google.com",
-    notes: "Main Google account",
-    createdAt: "2024-01-15",
-  },
-  {
-    id: 2,
-    siteName: "GitHub",
-    username: "johndoe",
-    password: "GitHubPass456@",
-    url: "https://github.com",
-    notes: "Development account",
-    createdAt: "2024-01-10",
-  },
-  {
-    id: 3,
-    siteName: "Netflix",
-    username: "john.doe@email.com",
-    password: "NetflixFun789#",
-    url: "https://netflix.com",
-    notes: "Family subscription",
-    createdAt: "2024-01-05",
-  },
-]
+interface PasswordData {
+  id: string
+  siteName: string
+  username: string
+  password: string
+  url?: string
+  notes?: string
+  createdAt: string
+}
 
 export function YourPasswords() {
-  const [visiblePasswords, setVisiblePasswords] = useState<Set<number>>(new Set())
+  const { passwords, deletePassword } = useSecura()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set())
 
-  const togglePasswordVisibility = (passwordId: number) => {
-    const newVisiblePasswords = new Set(visiblePasswords)
-    if (newVisiblePasswords.has(passwordId)) {
-      newVisiblePasswords.delete(passwordId)
-    } else {
-      newVisiblePasswords.add(passwordId)
-    }
-    setVisiblePasswords(newVisiblePasswords)
+  const togglePasswordVisibility = (passwordId: string) => {
+    setVisiblePasswords(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(passwordId)) {
+        newSet.delete(passwordId)
+      } else {
+        newSet.add(passwordId)
+      }
+      return newSet
+    })
   }
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, itemName: string) => {
     navigator.clipboard.writeText(text)
+    toast.success(`${itemName} copied to clipboard`)
+  }
+
+  const handleDelete = (passwordId: string) => {
+    if (confirm("Are you sure you want to delete this password?")) {
+      deletePassword(passwordId)
+      toast.success("Password deleted successfully")
+    }
   }
 
   const maskPassword = (password: string) => {
-    return "•".repeat(password.length)
+    return "*".repeat(password.length)
   }
 
   const getPasswordStrength = (password: string) => {
-    if (
-      password.length >= 12 &&
-      /[A-Z]/.test(password) &&
-      /[a-z]/.test(password) &&
-      /\d/.test(password) &&
-      /[!@#$%^&*]/.test(password)
-    ) {
-      return { strength: "Strong", color: "bg-green-100 text-green-800" }
-    } else if (password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password)) {
-      return { strength: "Medium", color: "bg-yellow-100 text-yellow-800" }
-    } else {
-      return { strength: "Weak", color: "bg-red-100 text-red-800" }
+    let score = 0
+    if (password.length >= 8) score++
+    if (/[a-z]/.test(password)) score++
+    if (/[A-Z]/.test(password)) score++
+    if (/[0-9]/.test(password)) score++
+    if (/[^A-Za-z0-9]/.test(password)) score++
+
+    switch (score) {
+      case 0:
+      case 1:
+        return { strength: "Very Weak", color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300" }
+      case 2:
+        return { strength: "Weak", color: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300" }
+      case 3:
+        return { strength: "Fair", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300" }
+      case 4:
+        return { strength: "Good", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" }
+      case 5:
+        return { strength: "Strong", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" }
+      default:
+        return { strength: "Unknown", color: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300" }
     }
   }
+
+  const filteredPasswords = passwords.filter(password =>
+    password.siteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    password.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (password.url && password.url.toLowerCase().includes(searchQuery.toLowerCase()))
+  )
 
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Key className="h-5 w-5" />
-          Your Passwords ({mockPasswords.length})
+          <Lock className="h-5 w-5" />
+          Your Passwords ({passwords.length})
         </CardTitle>
-        <CardDescription>Manage your saved login credentials</CardDescription>
+        <CardDescription>Manage your saved passwords</CardDescription>
+        <div className="relative mt-2">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search passwords..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </CardHeader>
       <CardContent>
-        {mockPasswords.length === 0 ? (
+        {filteredPasswords.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            <Key className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No passwords saved yet</p>
+            <Lock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>{searchQuery ? "No passwords match your search" : "No passwords saved yet"}</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {mockPasswords.map((item) => {
+            {filteredPasswords.map((item) => {
               const passwordStrength = getPasswordStrength(item.password)
               return (
                 <Card key={item.id} className="border-l-4 border-l-primary">
                   <CardContent className="pt-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div>
-                          <h3 className="font-semibold text-lg">{item.siteName}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge className={passwordStrength.color}>{passwordStrength.strength}</Badge>
-                            {item.url && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 px-2"
-                                onClick={() => window.open(item.url, "_blank")}
-                              >
-                                <ExternalLink className="h-3 w-3" />
-                              </Button>
-                            )}
-                          </div>
-                        </div>
+                        <h3 className="font-semibold text-lg">{item.siteName}</h3>
+                        <Badge className={passwordStrength.color}>{passwordStrength.strength}</Badge>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => togglePasswordVisibility(item.id)}>
-                          {visiblePasswords.has(item.id) ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => togglePasswordVisibility(item.id)}
+                        >
+                          {visiblePasswords.has(item.id) ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </Button>
-                        <Button variant="ghost" size="sm" className="text-destructive">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => handleDelete(item.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
 
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Username:</span>
+                        <span className="text-sm text-muted-foreground">Username:</span>
                         <div className="flex items-center gap-2">
                           <span>{item.username}</span>
-                          <Button variant="ghost" size="sm" onClick={() => copyToClipboard(item.username)}>
-                            <Copy className="h-3 w-3" />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => copyToClipboard(item.username, "Username")}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </div>
+
                       <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Password:</span>
+                        <span className="text-sm text-muted-foreground">Password:</span>
                         <div className="flex items-center gap-2">
                           <span className="font-mono">
                             {visiblePasswords.has(item.id) ? item.password : maskPassword(item.password)}
                           </span>
-                          <Button variant="ghost" size="sm" onClick={() => copyToClipboard(item.password)}>
-                            <Copy className="h-3 w-3" />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => copyToClipboard(item.password, "Password")}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       </div>
+
                       {item.url && (
                         <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground">URL:</span>
-                          <span
-                            className="text-blue-600 hover:underline cursor-pointer"
-                            onClick={() => window.open(item.url, "_blank")}
-                          >
-                            {item.url}
-                          </span>
+                          <span className="text-sm text-muted-foreground">URL:</span>
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={item.url.startsWith("http") ? item.url : `https://${item.url}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline flex items-center gap-1"
+                            >
+                              {item.url} <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </div>
                         </div>
                       )}
+
                       {item.notes && (
-                        <div className="flex justify-between items-start">
-                          <span className="text-muted-foreground">Notes:</span>
-                          <span className="text-right max-w-xs">{item.notes}</span>
+                        <div className="mt-2">
+                          <span className="text-sm text-muted-foreground">Notes:</span>
+                          <p className="mt-1 text-sm bg-muted/50 p-2 rounded">{item.notes}</p>
                         </div>
                       )}
-                      <div className="flex justify-between items-center text-xs text-muted-foreground">
-                        <span>Created:</span>
-                        <span>{item.createdAt}</span>
+
+                      <div className="text-xs text-muted-foreground mt-2">
+                        Added on {new Date(item.createdAt).toLocaleDateString()}
                       </div>
                     </div>
                   </CardContent>
