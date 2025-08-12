@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { Settings, Shield, Download, Upload, Trash2, Moon, Sun, User, Key, CreditCard } from "lucide-react";
+import { Settings, Shield, Download, Upload, Trash2, Moon, Sun, User, CreditCard } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";

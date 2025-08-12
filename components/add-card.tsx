@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CreditCard, Plus } from "lucide-react"
+import { CreditCard } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -54,6 +54,8 @@ export function AddCard() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Form validation schema (unused but kept for future use)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   })

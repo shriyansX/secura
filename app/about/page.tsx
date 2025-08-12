@@ -1,4 +1,3 @@
-import { Shield, Lock, CreditCard, Search } from "lucide-react"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {

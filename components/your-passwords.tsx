@@ -9,15 +9,7 @@ import { Lock, Eye, EyeOff, Trash2, Copy, Search, ExternalLink } from "lucide-re
 import { useSecura } from "@/lib/context/SecuraContext"
 import toast from "react-hot-toast"
 
-interface PasswordData {
-  id: string
-  siteName: string
-  username: string
-  password: string
-  url?: string
-  notes?: string
-  createdAt: string
-}
+// PasswordData interface is defined in the context, so we don't need to redefine it here
 
 export function YourPasswords() {
   const { passwords, deletePassword } = useSecura()

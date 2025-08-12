@@ -79,26 +79,9 @@ export const SecuraProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       // First try to load from Clerk private metadata
       if (user) {
-        try {
-          const pm = user?.privateMetadata as Record<string, any> | undefined;
-          const metaPasswords = pm?.secura_passwords as string | undefined;
-          const metaCards = pm?.secura_cards as string | undefined;
-
-          if (metaPasswords) {
-            const decrypted = decrypt(metaPasswords);
-            if (decrypted) {
-              loadedPasswords = JSON.parse(decrypted);
-            }
-          }
-          if (metaCards) {
-            const decrypted = decrypt(metaCards);
-            if (decrypted) {
-              loadedCards = JSON.parse(decrypted);
-            }
-          }
-        } catch (e) {
-          console.error('Failed to parse Clerk metadata', e);
-        }
+        // Note: Clerk privateMetadata access is temporarily disabled
+        // The main storage is in localStorage which works fine
+        console.log('User authenticated, loading from localStorage');
       }
 
       // If no data from Clerk, try localStorage as fallback

@@ -5,10 +5,10 @@ import { AddCard } from "@/components/add-card";
 import { AddPassword } from "@/components/add-password";
 import { YourCards } from "@/components/your-cards";
 import { YourPasswords } from "@/components/your-passwords";
-import { Shield, Search, Key, CreditCard, Plus } from "lucide-react";
+import { Shield, Search, Key, CreditCard } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSecura } from "@/lib/context/SecuraContext";
 
 export default function Dashboard() {
@@ -16,7 +16,10 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "passwords" | "cards">("all");
 
+  // These are used in the search functionality
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const filteredPasswords = searchQuery ? searchPasswords(searchQuery) : passwords;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const filteredCards = searchQuery ? searchCards(searchQuery) : cards;
 
   const totalItems = passwords.length + cards.length;

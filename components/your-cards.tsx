@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,16 +9,7 @@ import { CreditCard, Eye, EyeOff, Trash2, Copy, Search } from "lucide-react"
 import { useSecura } from "@/lib/context/SecuraContext"
 import toast from "react-hot-toast"
 
-interface CardData {
-  id: string
-  cardName: string
-  cardholderName: string
-  cardNumber: string
-  expiryDate: string
-  cvv: string
-  cardType: string
-  createdAt: string
-}
+// CardData interface is defined in the context, so we don't need to redefine it here
 
 export function YourCards() {
   const { cards, deleteCard } = useSecura()
