@@ -1,4 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Secura - Secure Password Manager
+
+A modern, secure password manager built with Next.js, TypeScript, and Clerk authentication.
+
+## Environment Variables
+
+To run this application, you need to set up the following environment variables:
+
+### Required Variables
+
+```bash
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
+CLERK_SECRET_KEY=sk_test_your_secret_key_here
+```
+
+### Getting Clerk Keys
+
+1. Go to [Clerk Dashboard](https://dashboard.clerk.com/)
+2. Create a new application or select an existing one
+3. Go to API Keys section
+4. Copy your Publishable Key and Secret Key
+5. Add them to your environment variables
+
+### For Vercel Deployment
+
+1. Go to your Vercel project dashboard
+2. Navigate to Settings → Environment Variables
+3. Add the required environment variables
+4. Redeploy your application
 
 ## Getting Started
 

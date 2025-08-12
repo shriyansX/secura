@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ClerkProvider } from '@clerk/nextjs';
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SecuraProvider } from "@/lib/context/SecuraContext";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
+import { ClerkProviderWrapper } from "@/components/clerk-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,9 +34,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ClerkProviderWrapper>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -61,8 +61,8 @@ export default function RootLayout({
               />
             </SecuraProvider>
           </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProviderWrapper>
+      </body>
+    </html>
   );
 }
