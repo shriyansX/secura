@@ -105,7 +105,7 @@ Make sure to run `pnpm test` before submitting.
 
 ## 📜 License
 
-MIT © 2025 [Shriyans Mukherjee].
+MIT © 2025 Shriyans Mukherjee
 
 ---
 
