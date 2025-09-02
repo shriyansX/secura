@@ -30,7 +30,7 @@ Secura lets you create, store and autofill strong passwords—fully encrypted, a
 | Testing | Vitest, React Testing Library |
 | Deployment | Vercel |
 
-## 📂 Folder Structure  MAA KE NAMAN
+## 📂 Folder Structure
 
 ```text
 secura/
