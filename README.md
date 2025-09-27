@@ -1,4 +1,4 @@
-# Secura 🔐
+# Secura 🔐2
 A modern, open-source password manager built with **Next.js 15**, **TypeScript**, **Tailwind CSS** and **Clerk** authentication.
 
 ![Version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)
